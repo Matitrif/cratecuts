@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 
 from models import user, album, review
+from routers import albums
 
 app = FastAPI(
     title="CrateCuts API",
@@ -25,3 +26,5 @@ def create_tables():
 @app.get("/")
 def root():
     return {"mensaje": "CrateCuts API funcionando correctamente"}
+
+app.include_router(albums.router, prefix="/albumes", tags=["álbumes"])
