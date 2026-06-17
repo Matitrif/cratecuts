@@ -13,8 +13,8 @@ class Review(Base):
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, index=True)
-    idusuario = Column(Integer, ForeignKey("users.id"), nullable=False)
-    idalbum = Column(Integer, ForeignKey("albums.id"), nullable=False)
+    id_usuario = Column(Integer, ForeignKey("users.id"), nullable=False)
+    id_album = Column(Integer, ForeignKey("albums.id"), nullable=False)
     rating = Column(Float)
     nota = Column(String)
     estado = Column(Enum(StatusEnum), default=StatusEnum.wishlist)
