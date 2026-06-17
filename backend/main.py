@@ -1,7 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database import engine, Base
 
-app = FastAPI(title="Cratecuts API")
+from models import user, album, review
+
+app = FastAPI(
+    title="CrateCuts API",
+    description="API para gestionar tu backlog de música",
+    version="1.0.0",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -11,6 +18,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def create_tables():
+    Base.metadata.create_all(bind=engine)
+
 @app.get("/")
 def root():
-    return {"mensaje": "Cratecuts API funcionando ✓"}
+    return {"mensaje": "CrateCuts API funcionando correctamente"}
