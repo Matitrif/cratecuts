@@ -4,6 +4,9 @@ import RutaProtegida from './components/RutaProtegida'
 import Login from './pages/Login'
 import Registro from './pages/Registro'
 import Inicio from './pages/Inicio'
+import Albumes from './pages/Albumes'
+import AlbumInfo from './pages/AlbumInfo'
+import BuscarAlbum from './pages/BuscarAlbum'
 
 function App() {
   return (
@@ -17,6 +20,38 @@ function App() {
             element={
               <RutaProtegida>
                 <Inicio />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/albumes"
+            element={
+              <RutaProtegida>
+                <Albumes />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/albumes/:id"
+            element={
+              <RutaProtegida>
+                <AlbumInfo />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/albumes/buscar"
+            element={
+              <RutaProtegida>
+                <BuscarAlbum />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/albumes/vista-previa"
+            element={
+              <RutaProtegida>
+                <AlbumInfo />
               </RutaProtegida>
             }
           />

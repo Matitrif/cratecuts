@@ -27,8 +27,8 @@ export default function Login() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <div style={{ width: '340px' }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', marginBottom: '0.3rem' }}>
-           Cratecuts
+        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '2rem', marginBottom: '0.3rem' }}>
+            Cratecuts
         </h1>
         <p className="label-mono" style={{ marginBottom: '2rem' }}>Inicia sesión</p>
 

@@ -10,6 +10,11 @@ router = APIRouter()
 
 @router.post("/", response_model=AlbumSalida)
 def crear_album(album: AlbumCrear, db: Session = Depends(get_db)):
+    if album.id_musicbrainz:
+        existente = db.query(Album).filter(Album.id_musicbrainz == album.id_musicbrainz).first()
+        if existente:
+            return existente
+
     nuevo_album = Album(**album.model_dump())
     db.add(nuevo_album)
     db.commit()
