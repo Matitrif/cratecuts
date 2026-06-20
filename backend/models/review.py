@@ -14,7 +14,7 @@ class Review(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_usuario = Column(Integer, ForeignKey("users.id"), nullable=False)
-    id_album = Column(Integer, ForeignKey("albums.id"), nullable=False)
+    id_album = Column(Integer, ForeignKey("albums.id", ondelete="CASCADE"), nullable=False)
     rating = Column(Float)
     nota = Column(String)
     estado = Column(Enum(StatusEnum), default=StatusEnum.wishlist)

@@ -11,3 +11,7 @@ export function obtenerAlbum(idAlbum) {
 export function crearAlbum(datos) {
   return api.post('/albumes/', datos)
 }
+
+export function eliminarAlbum(idAlbum) {
+  return api.delete(`/albumes/${idAlbum}`)
+}

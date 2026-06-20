@@ -6,7 +6,7 @@ class ReviewBase(BaseModel):
     id_album: int
     rating: Optional[float] = None
     nota: Optional[str] = None
-    estado: StatusEnum = StatusEnum.wishlist
+    estado: StatusEnum = StatusEnum.completado
 
 class ReviewCrear(ReviewBase):
     pass
@@ -19,6 +19,17 @@ class ReviewActualizar(BaseModel):
 class ReviewSalida(ReviewBase):
     id: int
     id_usuario: int
+
+    class Config:
+        from_attributes = True
+
+
+class ReviewPublica(BaseModel):
+    id: int
+    id_album: int
+    id_usuario: int
+    rating: Optional[float] = None
+    nota: Optional[str] = None
 
     class Config:
         from_attributes = True

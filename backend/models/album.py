@@ -13,4 +13,4 @@ class Album(Base):
     url_portada = Column(String)
     id_musicbrainz = Column(String, unique=True)
 
-    reviews = relationship("Review", back_populates="album")
+    reviews = relationship("Review", back_populates="album", cascade="all, delete-orphan")

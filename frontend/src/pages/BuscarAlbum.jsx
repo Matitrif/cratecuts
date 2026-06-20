@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { buscarAlbumesExternos } from '../api/musicbrainz'
-import { listarAlbumes } from '../api/albums'
+import { listarAlbumes, crearAlbum } from '../api/albums'
 
 export default function BuscarAlbum() {
   const [query, setQuery] = useState('')
   const [resultados, setResultados] = useState([])
   const [coleccion, setColeccion] = useState([])
   const [buscando, setBuscando] = useState(false)
+  const [anadiendo, setAnadiendo] = useState(null)
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
@@ -32,30 +33,40 @@ export default function BuscarAlbum() {
     }
   }
 
-    function buscarEnColeccion(resultado) {
-        console.log('ID del resultado:', resultado.id_musicbrainz)
-        console.log('Colección completa:', JSON.stringify(coleccion, null, 2))
-        
-        const porId = coleccion.find(
-        (album) => album.id_musicbrainz && album.id_musicbrainz === resultado.id_musicbrainz
-        )
-        if (porId) return porId
+  function buscarEnColeccion(resultado) {
+    const porId = coleccion.find(
+      (album) => album.id_musicbrainz && album.id_musicbrainz === resultado.id_musicbrainz
+    )
+    if (porId) return porId
 
-        return coleccion.find(
-        (album) =>
-            album.titulo.toLowerCase().trim() === resultado.titulo.toLowerCase().trim() &&
-            album.artista.toLowerCase().trim() === resultado.artista.toLowerCase().trim()
-        )
-    }
+    return coleccion.find(
+      (album) =>
+        album.titulo.toLowerCase().trim() === resultado.titulo.toLowerCase().trim() &&
+        album.artista.toLowerCase().trim() === resultado.artista.toLowerCase().trim()
+    )
+  }
 
-    function abrirResultado(resultado) {
-        const existente = buscarEnColeccion(resultado)
-        if (existente) {
-        navigate(`/albumes/${existente.id}`)
-        } else {
-        navigate('/albumes/vista-previa', { state: resultado })
-        }
+  async function handleAnadir(e, resultado) {
+    e.stopPropagation()
+    setAnadiendo(resultado.id_musicbrainz)
+    try {
+      const res = await crearAlbum(resultado)
+      setColeccion((prev) => [...prev, res.data])
+      navigate(`/albumes/${res.data.id}`)
+    } catch {
+      setError('No se pudo añadir el álbum.')
+      setAnadiendo(null)
     }
+  }
+
+  function abrirResultado(resultado) {
+    const existente = buscarEnColeccion(resultado)
+    if (existente) {
+      navigate(`/albumes/${existente.id}`)
+    } else {
+      navigate('/albumes/vista-previa', { state: resultado })
+    }
+  }
 
   return (
     <div>
@@ -83,7 +94,7 @@ export default function BuscarAlbum() {
 
         <div className="resultado-busqueda-lista">
           {resultados.map((resultado) => {
-            const yaAnadido = Boolean(buscarEnColeccion(resultado))
+            const existente = buscarEnColeccion(resultado)
             return (
               <div
                 key={resultado.id_musicbrainz}
@@ -102,7 +113,18 @@ export default function BuscarAlbum() {
                   <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>{resultado.titulo}</p>
                   <p className="label-mono">{resultado.artista} {resultado.lanzamiento ? `· ${resultado.lanzamiento}` : ''}</p>
                 </div>
-                {yaAnadido && <span className="etiqueta-anadido">En tu colección</span>}
+                {existente ? (
+                  <span className="etiqueta-anadido">En tu colección</span>
+                ) : (
+                  <button
+                    className="btn-primary"
+                    onClick={(e) => handleAnadir(e, resultado)}
+                    disabled={anadiendo === resultado.id_musicbrainz}
+                    style={{ marginLeft: 'auto', flexShrink: 0, padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+                  >
+                    {anadiendo === resultado.id_musicbrainz ? '...' : 'Añadir'}
+                  </button>
+                )}
               </div>
             )
           })}

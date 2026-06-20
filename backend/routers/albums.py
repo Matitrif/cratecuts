@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from database import get_db
+from dependencies import requerir_admin
 from models.album import Album
+from models.user import User
 from schemas.album import AlbumCrear, AlbumActualizar, AlbumSalida
 
 router = APIRouter()
@@ -36,7 +38,7 @@ def obtener_album(id_album: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{id_album}", response_model=AlbumSalida)
-def actualizar_album(id_album: int, datos: AlbumActualizar, db: Session = Depends(get_db)):
+def actualizar_album(id_album: int, datos: AlbumActualizar, db: Session = Depends(get_db), _: User = Depends(requerir_admin)):
     album = db.query(Album).filter(Album.id == id_album).first()
     if not album:
         raise HTTPException(status_code=404, detail="Álbum no encontrado")
@@ -50,7 +52,7 @@ def actualizar_album(id_album: int, datos: AlbumActualizar, db: Session = Depend
 
 
 @router.delete("/{id_album}")
-def eliminar_album(id_album: int, db: Session = Depends(get_db)):
+def eliminar_album(id_album: int, db: Session = Depends(get_db), _: User = Depends(requerir_admin)):
     album = db.query(Album).filter(Album.id == id_album).first()
     if not album:
         raise HTTPException(status_code=404, detail="Álbum no encontrado")

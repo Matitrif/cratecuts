@@ -8,8 +8,8 @@
   --color-border: #322c24;
   --color-text: #f1ede4;
   --color-text-muted: #9c9588;
-  --color-accent: #2ecc71;
-  --color-accent-dim: #1c5c3b;
+--color-accent: #f2691c;
+--color-accent-dim: #6b3210;
   --color-error: #d96c5f;
 
   --font-display: 'Cabinet Grotesk', sans-serif;
@@ -338,4 +338,66 @@ body::before {
 
 .navbar-icono:hover {
   color: var(--color-accent);
+}
+
+.select-field {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.55rem 0.6rem;
+  outline: none;
+}
+
+.textarea-field {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.6rem;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s ease;
+}
+
+.textarea-field:focus {
+  border-color: var(--color-accent);
+}
+
+.selector-estrellas {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.estrella-boton {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--color-border);
+  padding: 0;
+  line-height: 1;
+}
+
+.estrella-boton.activa {
+  color: var(--color-accent);
+}
+
+.mi-review-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.campo-form {
+  margin-bottom: 1rem;
 }

@@ -28,3 +28,12 @@ def obtener_usuario_actual(token: str = Depends(oauth2_scheme), db: Session = De
         raise credenciales_invalidas
 
     return usuario
+
+
+def requerir_admin(usuario_actual: User = Depends(obtener_usuario_actual)) -> User:
+    if not usuario_actual.es_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requieren permisos de administrador",
+        )
+    return usuario_actual

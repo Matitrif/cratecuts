@@ -12,7 +12,7 @@ class AlbumBase(BaseModel):
 
 
 class AlbumCrear(AlbumBase):
-    pass
+    id_musicbrainz: str
 
 
 class AlbumActualizar(BaseModel):

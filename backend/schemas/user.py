@@ -13,6 +13,7 @@ class UserCrear(UserBase):
 
 class UserSalida(UserBase):
     id: int
+    es_admin: bool
 
     class Config:
         from_attributes = True
