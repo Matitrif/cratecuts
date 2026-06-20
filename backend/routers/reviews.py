@@ -16,15 +16,36 @@ def crear_review(
     usuario_actual: User = Depends(obtener_usuario_actual),
     db: Session = Depends(get_db),
 ):
-    nueva_review = Review(**review.model_dump(), id_usuario=usuario_actual.id)
+    existente = db.query(Review).filter(
+        Review.id_usuario == usuario_actual.id,
+        Review.id_album == review.id_album,
+    ).first()
+    if existente:
+        for campo, valor in review.model_dump(exclude_none=True).items():
+            setattr(existente, campo, valor)
+        db.commit()
+        db.refresh(existente)
+        return existente
+
+    nueva_review = Review(**review.model_dump(exclude_none=True), id_usuario=usuario_actual.id)
     db.add(nueva_review)
     db.commit()
     db.refresh(nueva_review)
     return nueva_review
 
 @router.get("/", response_model=List[ReviewPublica])
-def listar_reviews(db: Session = Depends(get_db)):
-    return db.query(Review).all()
+def listar_reviews(id_usuario: Optional[int] = None, db: Session = Depends(get_db)):
+    query = db.query(Review)
+    if id_usuario is not None:
+        query = query.filter(Review.id_usuario == id_usuario)
+    return query.all()
+
+@router.get("/mias", response_model=List[ReviewSalida])
+def obtener_mis_reviews(
+    usuario_actual: User = Depends(obtener_usuario_actual),
+    db: Session = Depends(get_db),
+):
+    return db.query(Review).filter(Review.id_usuario == usuario_actual.id).all()
 
 @router.get("/mia", response_model=Optional[ReviewSalida])
 def obtener_mi_review(

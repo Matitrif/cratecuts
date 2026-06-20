@@ -3,18 +3,25 @@ import { useNavigate, Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { buscarAlbumesExternos } from '../api/musicbrainz'
 import { listarAlbumes, crearAlbum } from '../api/albums'
+import { obtenerMisReviews, crearReview } from '../api/reviews'
 
 export default function BuscarAlbum() {
   const [query, setQuery] = useState('')
   const [resultados, setResultados] = useState([])
   const [coleccion, setColeccion] = useState([])
+  const [misReviews, setMisReviews] = useState({})
   const [buscando, setBuscando] = useState(false)
   const [anadiendo, setAnadiendo] = useState(null)
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
-    listarAlbumes().then((res) => setColeccion(res.data))
+    Promise.all([listarAlbumes(), obtenerMisReviews()]).then(([resAlbumes, resMisReviews]) => {
+      setColeccion(resAlbumes.data)
+      const mapa = {}
+      resMisReviews.data.forEach((r) => { mapa[r.id_album] = r })
+      setMisReviews(mapa)
+    })
   }, [])
 
   async function manejarBusqueda(e) {
@@ -33,12 +40,11 @@ export default function BuscarAlbum() {
     }
   }
 
-  function buscarEnColeccion(resultado) {
+  function buscarEnDb(resultado) {
     const porId = coleccion.find(
       (album) => album.id_musicbrainz && album.id_musicbrainz === resultado.id_musicbrainz
     )
     if (porId) return porId
-
     return coleccion.find(
       (album) =>
         album.titulo.toLowerCase().trim() === resultado.titulo.toLowerCase().trim() &&
@@ -46,13 +52,20 @@ export default function BuscarAlbum() {
     )
   }
 
+  function estaEnMiColeccion(resultado) {
+    const enDb = buscarEnDb(resultado)
+    return enDb && Boolean(misReviews[enDb.id]?.estado)
+  }
+
   async function handleAnadir(e, resultado) {
     e.stopPropagation()
     setAnadiendo(resultado.id_musicbrainz)
     try {
       const res = await crearAlbum(resultado)
+      const idAlbum = res.data.id
+      await crearReview({ id_album: idAlbum, estado: 'completado' })
       setColeccion((prev) => [...prev, res.data])
-      navigate(`/albumes/${res.data.id}`)
+      navigate(`/albumes/${idAlbum}`)
     } catch {
       setError('No se pudo añadir el álbum.')
       setAnadiendo(null)
@@ -60,9 +73,9 @@ export default function BuscarAlbum() {
   }
 
   function abrirResultado(resultado) {
-    const existente = buscarEnColeccion(resultado)
-    if (existente) {
-      navigate(`/albumes/${existente.id}`)
+    const enDb = buscarEnDb(resultado)
+    if (enDb) {
+      navigate(`/albumes/${enDb.id}`)
     } else {
       navigate('/albumes/vista-previa', { state: resultado })
     }
@@ -94,7 +107,7 @@ export default function BuscarAlbum() {
 
         <div className="resultado-busqueda-lista">
           {resultados.map((resultado) => {
-            const existente = buscarEnColeccion(resultado)
+            const enColeccion = estaEnMiColeccion(resultado)
             return (
               <div
                 key={resultado.id_musicbrainz}
@@ -113,7 +126,7 @@ export default function BuscarAlbum() {
                   <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>{resultado.titulo}</p>
                   <p className="label-mono">{resultado.artista} {resultado.lanzamiento ? `· ${resultado.lanzamiento}` : ''}</p>
                 </div>
-                {existente ? (
+                {enColeccion ? (
                   <span className="etiqueta-anadido">En tu colección</span>
                 ) : (
                   <button

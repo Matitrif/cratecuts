@@ -6,7 +6,7 @@ class ReviewBase(BaseModel):
     id_album: int
     rating: Optional[float] = None
     nota: Optional[str] = None
-    estado: StatusEnum = StatusEnum.completado
+    estado: Optional[StatusEnum] = None
 
 class ReviewCrear(ReviewBase):
     pass

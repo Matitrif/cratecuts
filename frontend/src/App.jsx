@@ -7,6 +7,7 @@ import Inicio from './pages/Inicio'
 import Albumes from './pages/Albumes'
 import AlbumInfo from './pages/AlbumInfo'
 import BuscarAlbum from './pages/BuscarAlbum'
+import Perfil from './pages/Perfil'
 
 function App() {
   return (
@@ -52,6 +53,14 @@ function App() {
             element={
               <RutaProtegida>
                 <AlbumInfo />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/perfil/:id"
+            element={
+              <RutaProtegida>
+                <Perfil />
               </RutaProtegida>
             }
           />

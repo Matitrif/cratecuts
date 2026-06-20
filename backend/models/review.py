@@ -17,7 +17,7 @@ class Review(Base):
     id_album = Column(Integer, ForeignKey("albums.id", ondelete="CASCADE"), nullable=False)
     rating = Column(Float)
     nota = Column(String)
-    estado = Column(Enum(StatusEnum), default=StatusEnum.wishlist)
+    estado = Column(Enum(StatusEnum), nullable=True)
     creado_en = Column(DateTime(timezone=True), server_default=func.now())
     actualizado_en = Column(DateTime(timezone=True), onupdate=func.now())
 

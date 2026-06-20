@@ -24,3 +24,11 @@ export function eliminarReview(idReview) {
 export function obtenerMiReview(idAlbum) {
   return api.get('/reviews/mia', { params: { id_album: idAlbum } })
 }
+
+export function obtenerMisReviews() {
+  return api.get('/reviews/mias')
+}
+
+export function obtenerReviewsDeUsuario(idUsuario) {
+  return api.get('/reviews/', { params: { id_usuario: idUsuario } })
+}

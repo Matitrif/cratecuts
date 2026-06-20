@@ -15,7 +15,9 @@ export default function Navbar() {
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </Link>
-        <span className="label-mono">{usuario?.nombreusuario}</span>
+        <Link to={`/perfil/${usuario?.id}`} className="label-mono" style={{ color: 'inherit', textDecoration: 'none' }}>
+          {usuario?.nombreusuario}
+        </Link>
         <button className="btn-link" onClick={logout}>Cerrar sesión</button>
       </div>
     </nav>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import { obtenerAlbum, crearAlbum } from '../api/albums'
+import { obtenerAlbum, crearAlbum, obtenerAlbumPorMB } from '../api/albums'
 import { obtenerReviewsDeAlbum, crearReview, actualizarReview, eliminarReview, obtenerMiReview } from '../api/reviews'
 import { obtenerCanciones } from '../api/musicbrainz'
 import { useAuth } from '../context/AuthContext'
@@ -37,9 +37,38 @@ export default function AlbumInfo() {
   const [errorForm, setErrorForm] = useState('')
 
   useEffect(() => {
-    if (esVistaPrevia) return
-    cargarDatos()
-  }, [id])
+    if (!esVistaPrevia) {
+      cargarDatos()
+      return
+    }
+
+    const mbId = location.state?.id_musicbrainz
+    if (!mbId) return
+
+    obtenerCanciones(mbId)
+      .then((res) => setCanciones(res.data))
+      .catch(() => {})
+
+    obtenerAlbumPorMB(mbId)
+      .then((res) => {
+        const albumDb = res.data
+        setAlbum(albumDb)
+        return Promise.all([
+          obtenerReviewsDeAlbum(albumDb.id),
+          obtenerMiReview(albumDb.id),
+        ])
+      })
+      .then(([listaReviews, resMiReview]) => {
+        setReviews(listaReviews)
+        const propia = resMiReview.data
+        setMiReview(propia || null)
+        if (propia) {
+          setFormRating(propia.rating || 0)
+          setFormNota(propia.nota || '')
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   function cargarDatos() {
     setCargando(true)
@@ -63,7 +92,7 @@ export default function AlbumInfo() {
         if (albumData.id_musicbrainz) {
           obtenerCanciones(albumData.id_musicbrainz)
             .then((res) => setCanciones(res.data))
-            .catch(() => setCanciones([]))
+            .catch(() => {})
         }
       })
       .finally(() => setCargando(false))
@@ -73,8 +102,22 @@ export default function AlbumInfo() {
     setAnadiendo(true)
     setError('')
     try {
-      const res = await crearAlbum(album)
-      navigate(`/albumes/${res.data.id}`, { replace: true })
+      let idAlbum = album?.id
+      if (!idAlbum) {
+        const res = await crearAlbum(album)
+        idAlbum = res.data.id
+      }
+      if (!miReview) {
+        await crearReview({ id_album: idAlbum, estado: 'completado' })
+      } else if (!miReview.estado) {
+        await actualizarReview(miReview.id, { estado: 'completado' })
+      }
+      if (esVistaPrevia) {
+        navigate(`/albumes/${idAlbum}`, { replace: true })
+      } else {
+        cargarDatos()
+        setAnadiendo(false)
+      }
     } catch {
       setError('No se pudo añadir el álbum.')
       setAnadiendo(false)
@@ -94,15 +137,41 @@ export default function AlbumInfo() {
     }
 
     try {
-      if (miReview) {
-        await actualizarReview(miReview.id, datos)
-      } else {
-        await crearReview({ id_album: Number(id), ...datos })
+      let idAlbum = album?.id
+
+      if (!idAlbum) {
+        const resAlbum = await crearAlbum(album)
+        idAlbum = resAlbum.data?.id
+        if (!idAlbum) throw new Error('no_id')
+        setAlbum(resAlbum.data)
       }
+
+      let reviewGuardada
+      if (miReview) {
+        const res = await actualizarReview(miReview.id, datos)
+        reviewGuardada = res.data
+      } else {
+        const res = await crearReview({ id_album: idAlbum, ...datos })
+        reviewGuardada = res.data
+      }
+
+      if (esVistaPrevia) {
+        navigate(`/albumes/${idAlbum}`, { replace: true })
+        return
+      }
+
+      setMiReview(reviewGuardada)
+      setFormRating(reviewGuardada.rating || 0)
+      setFormNota(reviewGuardada.nota || '')
       setEditando(false)
-      cargarDatos()
-    } catch {
-      setErrorForm('No se pudo guardar la reseña.')
+      obtenerReviewsDeAlbum(Number(id)).then(setReviews)
+    } catch (err) {
+      const detalle = err?.response?.data?.detail
+      setErrorForm(
+        Array.isArray(detalle)
+          ? detalle.map((d) => d.msg).join(', ')
+          : 'No se pudo guardar la reseña.'
+      )
     } finally {
       setGuardando(false)
     }
@@ -117,7 +186,7 @@ export default function AlbumInfo() {
       setFormRating(0)
       setFormNota('')
       setEditando(false)
-      cargarDatos()
+      if (!esVistaPrevia) cargarDatos()
     } catch {
       setErrorForm('No se pudo eliminar la reseña.')
     } finally {
@@ -132,6 +201,8 @@ export default function AlbumInfo() {
   const promedio = conPuntuacion.length
     ? (conPuntuacion.reduce((suma, r) => suma + r.rating, 0) / conPuntuacion.length).toFixed(1)
     : null
+
+  const albumEnDb = Boolean(album?.id)
 
   return (
     <div>
@@ -161,13 +232,13 @@ export default function AlbumInfo() {
               )}
             </p>
 
-            {esVistaPrevia && (
-              <>
-                <button className="btn-primary" onClick={confirmarAnadir} disabled={anadiendo} style={{ marginTop: '1rem' }}>
+            {!miReview?.estado && (
+              <div style={{ marginTop: '1rem' }}>
+                <button className="btn-primary" onClick={confirmarAnadir} disabled={anadiendo}>
                   {anadiendo ? 'Añadiendo...' : 'Añadir a mi colección'}
                 </button>
-                {error && <p className="mensaje-error" style={{ marginTop: '0.8rem' }}>{error}</p>}
-              </>
+                {error && <p className="mensaje-error" style={{ marginTop: '0.5rem' }}>{error}</p>}
+              </div>
             )}
           </div>
         </div>
@@ -199,7 +270,7 @@ export default function AlbumInfo() {
           </div>
         )}
 
-        {!esVistaPrevia && (
+        {(
           <>
             <h2 className="label-mono" style={{ marginBottom: '0.8rem', marginTop: '2rem' }}>Tu reseña</h2>
 
