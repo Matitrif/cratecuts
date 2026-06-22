@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { obtenerAlbum, crearAlbum, obtenerAlbumPorMB } from '../api/albums'
-import { obtenerReviewsDeAlbum, crearReview, actualizarReview, eliminarReview, obtenerMiReview } from '../api/reviews'
+import { obtenerReviewsDeAlbum, crearReview, actualizarReview, obtenerMiReview } from '../api/reviews'
 import { obtenerCanciones } from '../api/musicbrainz'
 import { useAuth } from '../context/AuthContext'
 
@@ -181,12 +181,12 @@ export default function AlbumInfo() {
     if (!miReview) return
     setGuardando(true)
     try {
-      await eliminarReview(miReview.id)
-      setMiReview(null)
+      const res = await actualizarReview(miReview.id, { rating: null, nota: null })
+      setMiReview(res.data)
       setFormRating(0)
       setFormNota('')
       setEditando(false)
-      if (!esVistaPrevia) cargarDatos()
+      if (!esVistaPrevia) obtenerReviewsDeAlbum(Number(id)).then(setReviews)
     } catch {
       setErrorForm('No se pudo eliminar la reseña.')
     } finally {
@@ -274,7 +274,7 @@ export default function AlbumInfo() {
           <>
             <h2 className="label-mono" style={{ marginBottom: '0.8rem', marginTop: '2rem' }}>Tu reseña</h2>
 
-            {miReview && !editando ? (
+            {miReview && (miReview.rating != null || miReview.nota) && !editando ? (
               <div className="mi-review-card">
                 {miReview.rating != null && (
                   <div className="selector-estrellas" style={{ pointerEvents: 'none', marginBottom: '0.5rem' }}>

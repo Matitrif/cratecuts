@@ -26,7 +26,7 @@ export default function Perfil() {
 
         const lista = resReviews.data
           .map((r) => ({ review: r, album: mapaAlbumes[r.id_album] }))
-          .filter((e) => e.album)
+          .filter((e) => e.album && (e.review.rating != null || e.review.nota))
 
         setEntradas(lista)
       })
@@ -50,7 +50,7 @@ export default function Perfil() {
         </p>
 
         {entradas.length === 0 && (
-          <p style={{ color: 'var(--color-text-muted)' }}>Este usuario todavía no ha reseñado ningún álbum.</p>
+          <p style={{ color: 'var(--color-text-muted)' }}>Todavía no has reseñado ningún álbum.</p>
         )}
 
         <div className="album-grid">
