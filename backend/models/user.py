@@ -11,6 +11,8 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     es_admin = Column(Boolean, default=False, nullable=False)
+    biografia = Column(String, nullable=True)
+    foto_perfil = Column(String, nullable=True)
     creado_en = Column(DateTime(timezone=True), server_default=func.now())
 
     reviews = relationship("Review", back_populates="usuario")

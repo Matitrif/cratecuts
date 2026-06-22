@@ -17,3 +17,13 @@ export function iniciarSesion(nombreusuario, password) {
 export function obtenerUsuario(idUsuario) {
   return api.get(`/usuarios/${idUsuario}`)
 }
+
+export function actualizarPerfil(datos) {
+  return api.put('/usuarios/me', datos)
+}
+
+export function subirFotoPerfil(archivo) {
+  const formData = new FormData()
+  formData.append('foto', archivo)
+  return api.post('/usuarios/me/foto', formData)
+}

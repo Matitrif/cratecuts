@@ -19,3 +19,11 @@ export function eliminarAlbum(idAlbum) {
 export function obtenerAlbumPorMB(idMusicbrainz) {
   return api.get(`/albumes/por-mb/${idMusicbrainz}`)
 }
+
+export function obtenerAlbumesDestacados() {
+  return api.get('/albumes/destacados')
+}
+
+export function obtenerEstadisticas() {
+  return api.get('/estadisticas')
+}

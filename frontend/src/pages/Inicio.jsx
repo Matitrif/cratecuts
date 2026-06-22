@@ -1,23 +1,93 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { useAuth } from '../context/AuthContext'
+import { obtenerAlbumesDestacados, obtenerEstadisticas } from '../api/albums'
 
 export default function Inicio() {
   const { usuario } = useAuth()
+  const [stats, setStats] = useState(null)
+  const [destacados, setDestacados] = useState([])
+
+  useEffect(() => {
+    obtenerEstadisticas().then((res) => setStats(res.data)).catch(() => {})
+    obtenerAlbumesDestacados().then((res) => setDestacados(res.data)).catch(() => {})
+  }, [])
 
   return (
     <div>
       <Navbar />
       <div className="contenido">
-        <p className="label-mono">Sesión iniciada como</p>
-        <p style={{ fontSize: '1.3rem', fontFamily: 'var(--font-display)', marginBottom: '1.5rem' }}>
+        <p className="label-mono" style={{ marginBottom: '0.3rem' }}>Bienvenido</p>
+        <p style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '2.5rem' }}>
           {usuario?.nombreusuario}
         </p>
 
-        <Link to="/albumes" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>
-          Ver colección
-        </Link>
+        {stats && (
+          <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+            <div style={estiloStat}>
+              <span className="label-mono">Albums</span>
+              <span style={estiloNumero}>{stats.total_albumes}</span>
+            </div>
+            <div style={estiloStat}>
+              <span className="label-mono">Reseñas</span>
+              <span style={estiloNumero}>{stats.total_reviews}</span>
+            </div>
+            <div style={estiloStat}>
+              <span className="label-mono">Usuarios</span>
+              <span style={estiloNumero}>{stats.total_usuarios}</span>
+            </div>
+          </div>
+        )}
+
+        {destacados.length > 0 && (
+          <>
+            <p className="label-mono" style={{ marginBottom: '1rem' }}>Mejor valorados</p>
+            <div className="album-grid">
+              {destacados.map((album) => (
+                <Link key={album.id} to={`/albumes/${album.id}`} className="album-card">
+                  <div className="album-card-cover">
+                    {album.url_portada
+                      ? <img src={album.url_portada} alt={album.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : '♪'
+                    }
+                  </div>
+                  <div className="album-card-info">
+                    <div className="album-card-title">{album.titulo}</div>
+                    <div className="album-card-artist">{album.artista}</div>
+                    <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                        {album.promedio.toFixed(1)} / 5
+                      </span>
+                      <span className="label-mono" style={{ fontSize: '0.65rem' }}>
+                        {album.num_reviews} {album.num_reviews === 1 ? 'reseña' : 'reseñas'}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
+}
+
+const estiloStat = {
+  background: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
+  borderRadius: '8px',
+  padding: '1.2rem 2rem',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.4rem',
+  minWidth: '120px',
+}
+
+const estiloNumero = {
+  fontFamily: 'var(--font-display)',
+  fontWeight: 700,
+  fontSize: '2.2rem',
+  color: 'var(--color-accent)',
 }
