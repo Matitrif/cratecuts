@@ -12,10 +12,6 @@ export function crearAlbum(datos) {
   return api.post('/albumes/', datos)
 }
 
-export function eliminarAlbum(idAlbum) {
-  return api.delete(`/albumes/${idAlbum}`)
-}
-
 export function obtenerAlbumPorMB(idMusicbrainz) {
   return api.get(`/albumes/por-mb/${idMusicbrainz}`)
 }

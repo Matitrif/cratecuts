@@ -5,12 +5,6 @@ import { listarAlbumes } from '../api/albums'
 import { obtenerMisReviews, crearReview, actualizarReview } from '../api/reviews'
 import { useAuth } from '../context/AuthContext'
 
-const ETIQUETAS_ESTADO = {
-  wishlist: 'Pendiente',
-  escuchando: 'Escuchando',
-  completado: 'Completado',
-}
-
 const COLORES_ESTADO = {
   wishlist: 'var(--color-text-muted)',
   escuchando: '#9b7fd4',
