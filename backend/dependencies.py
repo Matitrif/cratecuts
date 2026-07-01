@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, status
+from typing import Optional
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -28,6 +29,23 @@ def obtener_usuario_actual(token: str = Depends(oauth2_scheme), db: Session = De
         raise credenciales_invalidas
 
     return usuario
+
+
+def obtener_usuario_opcional(request: Request, db: Session = Depends(get_db)) -> Optional[User]:
+    cabecera = request.headers.get("Authorization")
+    if not cabecera or not cabecera.lower().startswith("bearer "):
+        return None
+
+    token = cabecera.split(" ", 1)[1]
+    payload = decodificar_token(token)
+    if payload is None:
+        return None
+
+    id_usuario = payload.get("sub")
+    if id_usuario is None:
+        return None
+
+    return db.query(User).filter(User.id == int(id_usuario)).first()
 
 
 def requerir_admin(usuario_actual: User = Depends(obtener_usuario_actual)) -> User:

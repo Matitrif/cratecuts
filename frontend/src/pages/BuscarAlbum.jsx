@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { buscarAlbumesExternos } from '../api/musicbrainz'
 import { listarAlbumes, crearAlbum } from '../api/albums'
@@ -85,8 +85,6 @@ export default function BuscarAlbum() {
     <div>
       <Navbar />
       <div className="contenido">
-        <Link to="/albumes" className="volver-link">← Volver a la colección</Link>
-
         <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.8rem', marginBottom: '1.5rem' }}>
           Buscar álbumes
         </h1>

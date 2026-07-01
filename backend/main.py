@@ -4,11 +4,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from database import engine, Base, get_db
 
-from models import user, album, review
+from models import user, album, review, lista
 from models.album import Album
 from models.review import Review
 from models.user import User
-from routers import albums, reviews, users, auth, musicbrainz
+from routers import albums, reviews, users, auth, musicbrainz, listas
 
 app = FastAPI(
     title="CrateCuts API",
@@ -50,3 +50,4 @@ app.include_router(reviews.router, prefix="/reviews", tags=["reviews"])
 app.include_router(users.router, prefix="/usuarios", tags=["usuarios"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(musicbrainz.router, prefix="/musicbrainz", tags=["musicbrainz"])
+app.include_router(listas.router, prefix="/listas", tags=["listas"])

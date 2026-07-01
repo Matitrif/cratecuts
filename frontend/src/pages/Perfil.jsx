@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { obtenerUsuario, actualizarPerfil, subirFotoPerfil } from '../api/auth'
 import { listarAlbumes } from '../api/albums'
@@ -90,8 +90,6 @@ export default function Perfil() {
     <div>
       <Navbar />
       <div className="contenido">
-        <Link to="/albumes" className="volver-link">← Volver a la colección</Link>
-
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem', marginBottom: '2rem' }}>
           <div
             style={{
@@ -178,6 +176,8 @@ export default function Perfil() {
             </div>
           </form>
         )}
+
+        <h2 className="titulo-seccion" style={{ marginTop: '1rem' }}>Álbumes reseñados</h2>
 
         {entradas.length === 0 && (
           <p style={{ color: 'var(--color-text-muted)' }}>

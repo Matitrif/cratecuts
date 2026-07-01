@@ -13,7 +13,7 @@ const ETIQUETAS_ESTADO = {
 
 const COLORES_ESTADO = {
   wishlist: 'var(--color-text-muted)',
-  escuchando: '#f2a24a',
+  escuchando: '#9b7fd4',
   completado: 'var(--color-accent)',
 }
 

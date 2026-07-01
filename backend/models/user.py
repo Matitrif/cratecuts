@@ -16,3 +16,4 @@ class User(Base):
     creado_en = Column(DateTime(timezone=True), server_default=func.now())
 
     reviews = relationship("Review", back_populates="usuario")
+    listas = relationship("Lista", back_populates="usuario", cascade="all, delete-orphan")

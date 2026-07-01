@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useLocation, useNavigate, Link } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { obtenerAlbum, crearAlbum, obtenerAlbumPorMB } from '../api/albums'
 import { obtenerReviewsDeAlbum, crearReview, actualizarReview, obtenerMiReview } from '../api/reviews'
@@ -208,10 +208,6 @@ export default function AlbumInfo() {
     <div>
       <Navbar />
       <div className="contenido">
-        <Link to={esVistaPrevia ? '/albumes/buscar' : '/albumes'} className="volver-link">
-          ← Volver {esVistaPrevia ? 'a la búsqueda' : 'a la colección'}
-        </Link>
-
         <div className="album-detail-header">
           <div className="album-detail-cover">
             {album.url_portada

@@ -8,6 +8,8 @@ import Albumes from './pages/Albumes'
 import AlbumInfo from './pages/AlbumInfo'
 import BuscarAlbum from './pages/BuscarAlbum'
 import Perfil from './pages/Perfil'
+import Listas from './pages/Listas'
+import ListaInfo from './pages/ListaInfo'
 
 function App() {
   return (
@@ -53,6 +55,22 @@ function App() {
             element={
               <RutaProtegida>
                 <AlbumInfo />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/listas"
+            element={
+              <RutaProtegida>
+                <Listas />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/listas/:id"
+            element={
+              <RutaProtegida>
+                <ListaInfo />
               </RutaProtegida>
             }
           />
